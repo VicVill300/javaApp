@@ -24,8 +24,8 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'docker-for-jenkins', variable: 'DOCKER_PASSWORD')]) {
-                        sh 'docker login -u villegas7155 -p ${DOCKER_PASSWORD}'
+                    withCredentials([usernamePassword(credentialsId: 'docker_for_jenkins', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh 'docker login -u $DOCKER_USER -p $DOCKER_PASSWORD'
                         sh 'docker push ${DOCKER_IMAGE}'
                     }
                 }

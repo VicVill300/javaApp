@@ -1,0 +1,19 @@
+# Kubernetes + Jenkins
+.kube/
+jenkins-kubeconfig.yaml
+token.b64
+token.txt
+
+# Java build output
+*.class
+*.jar
+target/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE/editor configs
+.vscode/
+.idea/
+*.swp

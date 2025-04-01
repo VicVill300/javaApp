@@ -6,8 +6,7 @@ pipeline {
         DOCKER_IMAGE = 'villegas7155/java-hello-world:latest'
     }
 
-    
-
+    stages {
         stage('Debug Workspace') {
             steps {
                 sh 'pwd && ls -l'

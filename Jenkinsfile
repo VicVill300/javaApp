@@ -6,7 +6,19 @@ pipeline {
         DOCKER_IMAGE = 'villegas7155/java-hello-world:latest'
     }
 
-    stages {        
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/VicVill300/javaApp.git'
+            }
+        }
+
+        stage('Debug Workspace') {
+            steps {
+                sh 'pwd && ls -l'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {
@@ -32,6 +44,15 @@ pipeline {
                     sh 'kubectl apply -f deployment.yaml'
                 }
             }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Pipeline completed successfully!'
+        }
+        failure {
+            echo '❌ Pipeline failed. Check logs.'
         }
     }
 }

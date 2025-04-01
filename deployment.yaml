@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-hello-world
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: java-hello-world
+  template:
+    metadata:
+      labels:
+        app: java-hello-world
+    spec:
+      containers:
+        - name: java-hello-world
+          image: villegas7155/java-hello-world:latest
+          command: ["java", "HelloWorld"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: java-hello-world-service
+spec:
+  selector:
+    app: java-hello-world
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer

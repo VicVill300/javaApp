@@ -6,12 +6,7 @@ pipeline {
         DOCKER_IMAGE = 'villegas7155/java-hello-world:latest'
     }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/VicVill300/javaApp.git'
-            }
-        }
+    
 
         stage('Debug Workspace') {
             steps {

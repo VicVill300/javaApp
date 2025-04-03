@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'villegas7155/java-hello-world:latest'
+        DOCKER_IMAGE_BASE = 'villegas7155/java-hello-world'
     }
 
     stages {
@@ -26,7 +27,28 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build & Push Docker Images for Multiple Java Versions') {
+            steps {
+                script {
+                    def javaVersions = ['11', '14', '17']
+                    for (version in javaVersions) {
+                        def tag = "java${version}"
+                        def imageName = "${env.DOCKER_IMAGE_BASE}:${tag}"
+
+                        echo "[INFO] Building image with Java ${version}: ${imageName}"
+                        bat "docker build -t ${imageName} --build-arg BASE_IMAGE=openjdk:${version}-jdk-slim ."
+
+                        withCredentials([usernamePassword(credentialsId: 'docker_for_jenkins', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                            echo "[INFO] Logging in and pushing ${imageName}"
+                            bat "docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%"
+                            bat "docker push ${imageName}"
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Build Docker Image (Default/Latest)') {
             steps {
                 bat '''
                     echo [INFO] Building Docker image...

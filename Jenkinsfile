@@ -9,14 +9,14 @@ pipeline {
     stages {
         stage('Debug Workspace') {
             steps {
-                sh 'pwd && ls -l'
+                bat 'pwd && ls -l'
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'docker build -t ${DOCKER_IMAGE} .'
+                    bat 'docker build -t ${DOCKER_IMAGE} .'
                 }
             }
         }
@@ -25,8 +25,8 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'docker_for_jenkins', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        sh 'docker login -u $DOCKER_USER -p $DOCKER_PASSWORD'
-                        sh 'docker push ${DOCKER_IMAGE}'
+                        bat 'docker login -u $DOCKER_USER -p $DOCKER_PASSWORD'
+                        bat 'docker push ${DOCKER_IMAGE}'
                     }
                 }
             }
@@ -35,7 +35,7 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    sh 'kubectl apply -f deployment.yaml'
+                    bat 'kubectl apply -f deployment.yaml'
                 }
             }
         }

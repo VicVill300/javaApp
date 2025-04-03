@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        SONARQUBE_SERVER = 'http://host.docker.internal:9000'
         DOCKER_IMAGE = 'villegas7155/java-hello-world:latest'
     }
 
@@ -55,10 +54,16 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                bat '''
-                    echo [INFO] Deploying to Kubernetes...
-                    kubectl apply -f deployment.yaml
-                '''
+                withCredentials([file(credentialsId: 'minikube_kubeconfig', variable: 'KUBECONFIG')]) {
+                    bat '''
+                        echo [INFO] Using kubeconfig from Jenkins credentials...
+                        kubectl config get-contexts
+                        echo [INFO] Applying deployment.yaml...
+                        kubectl apply -f deployment.yaml
+                        echo [INFO] Checking pod status...
+                        kubectl get pods
+                    '''
+                }
             }
         }
     }
@@ -68,7 +73,7 @@ pipeline {
             echo '✅ Pipeline completed successfully!'
         }
         failure {
-            echo '❌ Pipeline failed. Check the logs for errors.'
+            echo '❌ Pipeline failed. Check logs for details.'
         }
     }
 }

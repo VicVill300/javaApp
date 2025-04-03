@@ -10,9 +10,9 @@ pipeline {
         stage('Debug Workspace') {
             steps {
                 bat '''
-                    echo Current Directory:
+                    echo [INFO] Current Directory:
                     echo %cd%
-                    echo Listing files:
+                    echo [INFO] Listing Files:
                     dir /s
                 '''
             }
@@ -21,24 +21,32 @@ pipeline {
         stage('Build Java App') {
             steps {
                 bat '''
-                    echo Compiling Java code...
-                    if not exist app mkdir app
-                    javac -d app src/HelloWorld.java
+                    echo [INFO] Compiling HelloWorld.java...
+                    javac app/HelloWorld.java
                 '''
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t %DOCKER_IMAGE% .'
+                bat '''
+                    echo [INFO] Building Docker image...
+                    docker build -t %DOCKER_IMAGE% .
+                '''
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker_for_jenkins', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
+                withCredentials([usernamePassword(
+                    credentialsId: 'docker_for_jenkins',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASSWORD'
+                )]) {
                     bat '''
+                        echo [INFO] Logging in to Docker Hub...
                         docker login -u %DOCKER_USER% -p %DOCKER_PASSWORD%
+                        echo [INFO] Pushing Docker image...
                         docker push %DOCKER_IMAGE%
                     '''
                 }
@@ -47,7 +55,10 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                bat 'kubectl apply -f deployment.yaml'
+                bat '''
+                    echo [INFO] Deploying to Kubernetes...
+                    kubectl apply -f deployment.yaml
+                '''
             }
         }
     }
@@ -57,7 +68,7 @@ pipeline {
             echo '✅ Pipeline completed successfully!'
         }
         failure {
-            echo '❌ Pipeline failed. Check logs.'
+            echo '❌ Pipeline failed. Check the logs for errors.'
         }
     }
 }

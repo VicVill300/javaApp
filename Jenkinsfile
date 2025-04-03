@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        SONARQUBE_SERVER = 'http://localhost:9000'
+        SONARQUBE_SERVER = 'http://host.docker.internal:9000'
         DOCKER_IMAGE = 'villegas7155/java-hello-world:latest'
     }
 
@@ -13,7 +13,17 @@ pipeline {
                     echo Current Directory:
                     echo %cd%
                     echo Listing files:
-                    dir
+                    dir /s
+                '''
+            }
+        }
+
+        stage('Build Java App') {
+            steps {
+                bat '''
+                    echo Compiling Java code...
+                    if not exist app mkdir app
+                    javac -d app src/HelloWorld.java
                 '''
             }
         }
